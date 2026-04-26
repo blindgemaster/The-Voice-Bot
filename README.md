@@ -121,6 +121,3 @@ Other things you can tweak in `config.py`:
 - [ ] Conversation logging / transcript export
 - [ ] Per-turn metrics (STT/LLM/TTS latency)
 
-## License
-
-Not yet specified — add a `LICENSE` file before publishing if you want the code to be reusable.
