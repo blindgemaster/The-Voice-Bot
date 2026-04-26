@@ -1,0 +1,24 @@
+[project]
+name = "the-voice-bot"
+version = "0.1.0"
+description = "Urdu speech-to-speech bot with swappable STT, LLM, and TTS providers"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "nvidia-cublas-cu12>=12.9.1.4",
+    "nvidia-cudnn-cu12>=9.20.0.48",
+    "pipecat-ai[azure,local,openai,silero,whisper]",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+deepgram = ["pipecat-ai[deepgram]"]
+elevenlabs = ["pipecat-ai[elevenlabs]"]
+cartesia = ["pipecat-ai[cartesia]"]
+whisper-local = ["pipecat-ai[whisper]"]
+anthropic = ["pipecat-ai[anthropic]"]
+webrtc = ["pipecat-ai[webrtc]"]
+all = [
+    "pipecat-ai[local,openai,azure,silero,deepgram,elevenlabs,cartesia,whisper,anthropic,webrtc]",
+    "python-dotenv",
+]
