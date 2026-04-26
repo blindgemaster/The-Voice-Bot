@@ -1,47 +1,46 @@
 """LLM service factory — returns the configured language model provider."""
 
-import config
-from config import LLMProvider
+from config import Config, LLMProvider
 
 
-def create_llm():
-    provider = config.LLM
+def create_llm(cfg: Config):
+    p = cfg.llm_provider
 
-    if provider == LLMProvider.OLLAMA:
+    if p == LLMProvider.OLLAMA:
         from pipecat.services.openai.llm import OpenAILLMService
         from pipecat.services.openai.base_llm import OpenAILLMSettings
 
         return OpenAILLMService(
             api_key="ollama",
-            base_url=config.OLLAMA_BASE_URL,
-            settings=OpenAILLMSettings(model=config.OLLAMA_MODEL),
+            base_url=cfg.ollama_base_url,
+            settings=OpenAILLMSettings(model=cfg.ollama_model),
         )
 
-    if provider == LLMProvider.LMSTUDIO:
+    if p == LLMProvider.LMSTUDIO:
         from pipecat.services.openai.llm import OpenAILLMService
         from pipecat.services.openai.base_llm import OpenAILLMSettings
 
         return OpenAILLMService(
             api_key="lm-studio",
-            base_url=config.LMSTUDIO_BASE_URL,
-            settings=OpenAILLMSettings(model=config.LMSTUDIO_MODEL),
+            base_url=cfg.lmstudio_base_url,
+            settings=OpenAILLMSettings(model=cfg.lmstudio_model),
         )
 
-    if provider == LLMProvider.OPENAI:
+    if p == LLMProvider.OPENAI:
         from pipecat.services.openai.llm import OpenAILLMService
         from pipecat.services.openai.base_llm import OpenAILLMSettings
 
         return OpenAILLMService(
-            api_key=config.OPENAI_API_KEY,
-            settings=OpenAILLMSettings(model=config.OPENAI_LLM_MODEL),
+            api_key=cfg.openai_api_key,
+            settings=OpenAILLMSettings(model=cfg.openai_llm_model),
         )
 
-    if provider == LLMProvider.ANTHROPIC:
+    if p == LLMProvider.ANTHROPIC:
         from pipecat.services.anthropic import AnthropicLLMService
 
         return AnthropicLLMService(
-            api_key=config.ANTHROPIC_API_KEY,
-            model=config.ANTHROPIC_LLM_MODEL,
+            api_key=cfg.anthropic_api_key,
+            model=cfg.anthropic_llm_model,
         )
 
-    raise ValueError(f"Unknown LLM provider: {provider}")
+    raise ValueError(f"Unknown LLM provider: {p}")

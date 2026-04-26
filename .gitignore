@@ -11,3 +11,6 @@ wheels/
 
 # Environment secrets
 .env
+
+# UI-managed settings (provider selection, models, voices, system prompt)
+state.json

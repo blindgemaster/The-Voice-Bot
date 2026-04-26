@@ -5,8 +5,9 @@ description = "Urdu speech-to-speech bot with swappable STT, LLM, and TTS provid
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 dependencies = [
-    "nvidia-cublas-cu12>=12.9.1.4",
-    "nvidia-cudnn-cu12>=9.20.0.48",
+    "customtkinter>=5.2.2",
+    "nvidia-cublas-cu12>=12.9.1.4 ; sys_platform == 'win32'",
+    "nvidia-cudnn-cu12>=9.20.0.48 ; sys_platform == 'win32'",
     "pipecat-ai[azure,local,openai,silero,whisper]",
     "python-dotenv",
 ]
@@ -18,7 +19,31 @@ cartesia = ["pipecat-ai[cartesia]"]
 whisper-local = ["pipecat-ai[whisper]"]
 anthropic = ["pipecat-ai[anthropic]"]
 webrtc = ["pipecat-ai[webrtc]"]
+voxcpm = [
+    "voxcpm",
+    "scipy>=1.11",
+    "torch>=2.5",
+    "torchaudio>=2.5",
+    # triton-windows enables torch.compile on Windows, dropping VoxCPM's RTF
+    # from ~3x (CPU-bound diffusion loop) to <1x (real-time). Linux torch
+    # already bundles triton, so this is Windows-only.
+    "triton-windows ; sys_platform == 'win32'",
+]
 all = [
     "pipecat-ai[local,openai,azure,silero,deepgram,elevenlabs,cartesia,whisper,anthropic,webrtc]",
     "python-dotenv",
 ]
+
+# PyPI ships CPU-only PyTorch on Windows by default. Route torch / torchaudio /
+# torchcodec to PyTorch's CUDA wheel index so the local-GPU TTS (VoxCPM) can
+# actually use the RTX-class card. cu128 matches the cuBLAS 12.x runtime libs
+# pulled in for faster-whisper.
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+torchaudio = { index = "pytorch-cu128" }
+torchcodec = { index = "pytorch-cu128" }

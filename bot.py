@@ -1,4 +1,4 @@
-"""Entrypoint — runs the Urdu voice bot with local audio."""
+"""Entrypoint — runs the Urdu voice bot with local audio (CLI mode)."""
 
 import glob
 import os
@@ -16,16 +16,17 @@ import asyncio
 
 from pipecat.pipeline.runner import PipelineRunner
 
-from transports.local import get_transport
+from config import load_config
 from pipeline import build_pipeline
+from transports.local import get_transport
 
 
 async def main():
+    cfg = load_config()
     transport = get_transport()
-    task = build_pipeline(transport)
+    task, _context = build_pipeline(transport, cfg)
 
     runner = PipelineRunner()
-
     print("Listening... speak in Urdu or English")
     await runner.run(task)
 

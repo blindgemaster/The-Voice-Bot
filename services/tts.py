@@ -1,43 +1,56 @@
 """TTS service factory — returns the configured text-to-speech provider."""
 
-import config
-from config import TTSProvider
+from config import Config, TTSProvider
 
 
-def create_tts():
-    provider = config.TTS
+def create_tts(cfg: Config):
+    p = cfg.tts_provider
 
-    if provider == TTSProvider.AZURE:
+    if p == TTSProvider.AZURE:
         from pipecat.services.azure.tts import AzureTTSService, AzureTTSSettings
 
         return AzureTTSService(
-            api_key=config.AZURE_SPEECH_KEY,
-            region=config.AZURE_SPEECH_REGION,
-            settings=AzureTTSSettings(voice=config.AZURE_TTS_VOICE),
+            api_key=cfg.azure_speech_key,
+            region=cfg.azure_speech_region,
+            settings=AzureTTSSettings(voice=cfg.azure_tts_voice),
         )
 
-    if provider == TTSProvider.ELEVENLABS:
+    if p == TTSProvider.ELEVENLABS:
         from pipecat.services.elevenlabs.tts import ElevenLabsTTSService
 
         return ElevenLabsTTSService(
-            api_key=config.ELEVENLABS_API_KEY,
-            voice_id=config.ELEVENLABS_VOICE_ID,
+            api_key=cfg.elevenlabs_api_key,
+            voice_id=cfg.elevenlabs_voice_id,
         )
 
-    if provider == TTSProvider.OPENAI:
+    if p == TTSProvider.OPENAI:
         from pipecat.services.openai.tts import OpenAITTSService
 
         return OpenAITTSService(
-            api_key=config.OPENAI_API_KEY,
-            voice=config.OPENAI_TTS_VOICE,
+            api_key=cfg.openai_api_key,
+            voice=cfg.openai_tts_voice,
         )
 
-    if provider == TTSProvider.CARTESIA:
+    if p == TTSProvider.CARTESIA:
         from pipecat.services.cartesia.tts import CartesiaTTSService
 
         return CartesiaTTSService(
-            api_key=config.CARTESIA_API_KEY,
-            voice_id=config.CARTESIA_VOICE_ID,
+            api_key=cfg.cartesia_api_key,
+            voice_id=cfg.cartesia_voice_id,
         )
 
-    raise ValueError(f"Unknown TTS provider: {provider}")
+    if p == TTSProvider.VOXCPM:
+        try:
+            from services.voxcpm_tts import VoxCPMTTSService
+        except ImportError as e:
+            raise ImportError(
+                "VoxCPM is not installed. Run: uv sync --extra voxcpm"
+            ) from e
+        return VoxCPMTTSService(
+            reference_wav=cfg.voxcpm_reference_wav,
+            cfg_value=cfg.voxcpm_cfg_value,
+            inference_timesteps=cfg.voxcpm_inference_timesteps,
+            sample_rate=cfg.voxcpm_output_sample_rate,
+        )
+
+    raise ValueError(f"Unknown TTS provider: {p}")
